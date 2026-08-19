@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8"name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transmutaciones | CF Sistem</title>
+      <link rel="icon" type="image/png" href="/myvet/public/assets/logo.png">
+
+    <link rel="shortcut icon" href="/myvet/public/assets/logo.ico" type="image/x-icon">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+     <?php require_once __DIR__ . '/layout/icono.php' ?>
+    <?php if (function_exists('cargarEstilos')) { cargarEstilos(); } ?>   
+<link href="/myvet/css/transmutaciones.css" rel="stylesheet">
+</head>
+<body>
+    <?php if (function_exists('renderizarLayout')) renderizarLayout('Mermas'); ?>
+<div class="main-content">
+    <div class="container-fluid">
+        
+        <div class="page-header">
+            <div class="page-title">
+                <h1><i class="fas fa-random text-primary me-2"></i>Transmutación de Productos</h1>
+                <small class="text-body-secondary">Procesa la transformación de materiales e insumos</small>
+            </div>
+            
+        </div>
+
+       <div class="row align-items-stretch">
+    <div class="col-lg-4">
+        <div class="card card-custom mb-4 h-100">
+            <div class="card-header-custom">
+                <h6 class="m-0 font-weight-bold text-dark">
+                    <i class="fas fa-book me-2"></i>Guía de Equivalencias Activas
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalEquivalencia">
+                <i class="fas fa-cog me-1"></i> Nueva Regla
+            </button>
+                </h6>
+            </div>
+            <div class="card-body p-3">
+                
+                <?php require_once __DIR__ . '/transmutaciones/reglasConversion.php' ?>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card card-custom mb-4 h-100">
+            <div class="card-header-custom">
+                <h6 class="m-0 font-weight-bold" style="color: var(--primary-color);">
+                    <i class="fas fa-plus-circle me-2"></i>Nueva Operación de Transformación
+                </h6>
+            </div>
+            <div class="card-body p-4">
+                <form id="formTransmutacion">
+                    <div class="row align-items-stretch">
+                        <div class="col-xl-5">
+                            <div class="section-box box-origen">
+                                <div class="section-title text-danger">
+                                    <i class="fas fa-minus-circle me-2"></i>Producto Origen (Salida)
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-xs">Almacén de Trabajo</label>
+                                    <select name="almacen_id" id="trans_almacen" class="form-select shadow-sm" required>
+                                        <option value="">Seleccione Almacén...</option>
+                                        <?php foreach ($almacenes as $a): ?>
+                                            <option value="<?= $a['id'] ?>"><?= htmlspecialchars($a['nombre']) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-xs">Producto a Transformar</label>
+                                    <select name="producto_origen_id" id="trans_producto_origen" class="form-select" disabled required></select>
+                                </div>
+                                <div class="row g-2">
+                                    <div class="col-md-7">
+                                        <label class="form-label text-xs">Lote Origen</label>
+                                        <select name="lote_origen_id" id="trans_lote_origen" class="form-select" disabled required></select>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="form-label text-xs">Cant. Salida</label>
+                                        <input type="number" step="0.01" name="cantidad_origen" id="trans_cant_origen" class="form-control" required>
+                                        <div class="small mt-1 text-body-secondary">Stock: <span id="trans_stock_disp" class="fw-bold text-danger">0</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-2 conversion-arrow d-flex align-items-center justify-content-center">
+                            <i class="fas fa-arrow-right fa-2x d-none d-xl-block"></i>
+                            <i class="fas fa-arrow-down fa-2x d-xl-none my-3"></i>
+                        </div>
+
+                        <div class="col-xl-5">
+                            <div class="section-box box-destino">
+                                <div class="section-title text-success">
+                                    <i class="fas fa-plus-circle me-2"></i>Producto Destino (Entrada)
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-xs">Convertir a:</label>
+                                    <select name="producto_destino_id" id="trans_producto_destino" class="form-select" disabled required>
+                                        <option value="">Seleccione origen primero</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-xs">Lote Destino</label>
+                                    <select name="lote_destino_id" id="trans_lote_destino" class="form-select" disabled>
+                                        <option value="0">-- Crear Lote Nuevo --</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-xs">Cant. Obtenida (Real)</label>
+                                    <input type="number" step="0.01" name="cantidad_destino" id="trans_cant_destino" class="form-control" style="border-color: #68d391;" required>
+                                    <div id="info_conversion" class="small mt-1 fw-bold text-primary"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <textarea name="observaciones" class="form-control text-uppercase form-control-sm" rows="2" placeholder="Notas del proceso..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="text-end mt-3">
+                        <button type="reset" class="btn btn-light btn-sm me-2">Limpiar</button>
+                        <button type="submit" class="btn btn-primary btn-sm px-4 shadow">
+                            <i class="fas fa-check-circle me-1"></i> Procesar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <div class="card card-custom">
+            <div class="card-header-custom d-flex justify-content-between align-middle">
+                <h6 class="m-0 font-weight-bold text-dark"><i class="fas fa-history me-2"></i>Historial de Movimientos</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle" id="tablaHistorial">
+                        <thead class="table-light">
+                            <tr>
+                                <th width="50px">ID</th>
+                                <th>Fecha</th>
+                                <th>Origen (Sale)</th>
+                                <th>Cant.</th>
+                                <th>Destino (Entra)</th>
+                                <th>Cant.</th>
+                                <th>Responsable</th>
+                            </tr>
+                        </thead>
+                     <tbody>
+
+<?php if (!empty($historial)): ?>
+
+    <?php foreach ($historial as $t): ?>
+
+        <tr>
+
+            <td>
+                <span class="badge bg-light text-dark border">
+                    #<?= (int)$t['id'] ?>
+                </span>
+            </td>
+
+            <td>
+                <small>
+                    <?= date('d/m/Y H:i', strtotime($t['fecha_registro'])) ?>
+                </small>
+            </td>
+
+            <td>
+                <i class="fas fa-minus-circle text-danger me-1"></i>
+
+                <?= htmlspecialchars($t['producto_origen'] ?? 'N/A') ?>
+            </td>
+
+            <td class="fw-bold">
+                <?= number_format((float)$t['cant_origen'], 2) ?>
+
+                <?= htmlspecialchars($t['unidad_origen'] ?? 'N/A') ?>
+            </td>
+
+            <td>
+                <i class="fas fa-plus-circle text-success me-1"></i>
+
+                <?= htmlspecialchars($t['producto_destino'] ?? 'N/A') ?>
+            </td>
+
+            <td class="fw-bold">
+                <?= number_format((float)$t['cant_destino'], 2) ?>
+
+                <?= htmlspecialchars($t['unidad_destino'] ?? 'N/A') ?>
+            </td>
+
+            <td>
+                <i class="fas fa-user-circle me-1 text-body-secondary"></i>
+
+                <small>
+                    <?= htmlspecialchars($t['usuario_nombre'] ?? 'Sistema') ?>
+                </small>
+            </td>
+
+        </tr>
+
+    <?php endforeach; ?>
+
+<?php endif; ?>
+
+</tbody>
+                        
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="modal fade" id="modalEquivalencia" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content  shadow-lg" style="border-radius: 20px;">
+                <div class="modal-header  pb-0">
+                    <h5 class="modal-title fw-bold"><i class="fas fa-cog me-2 text-primary"></i>Configurar Equivalencia</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="formNuevaEquivalencia">
+                    <div class="modal-body p-4">
+                        <div class="alert alert-primary  shadow-sm small d-flex align-items-center" style="border-radius: 12px;">
+                            <i class="fas fa-info-circle fa-2x me-3"></i>
+                            <div>Define cuántas unidades del producto destino se obtienen por cada unidad del producto origen.</div>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Almacén de Aplicación</label>
+                               
+
+
+
+    <?php 
+    $idSesion = (int)($_SESSION['almacen_id'] ?? 0);
+    $esAdmin = ($idSesion === 0);
+    ?>
+
+    <?php if ($esAdmin): ?>
+        <select name="almacen_id" class="form-select shadow-sm border-primary" required>
+            <option value="">-- Seleccione Almacén --</option>
+            <?php foreach ($almacenes as $a): ?>
+                <?php if($a['id'] > 0): ?>
+                    <option value="<?= $a['id'] ?>"><?= htmlspecialchars($a['nombre']) ?></option>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </select>
+    <?php else: ?>
+        <?php 
+        // Buscamos el nombre real en el array de almacenes si no está en la sesión
+        $nombreAlmacen = $_SESSION['almacen_nombre'] ?? 'Almacén Asignado';
+        
+        foreach ($almacenes as $a) {
+            if ((int)$a['id'] === $idSesion) {
+                $nombreAlmacen = $a['nombre'];
+                break;
+            }
+        }
+        ?>
+        <div class="input-group shadow-sm">
+            <span class="input-group-text bg-light "><i class="fas fa-lock text-body-secondary"></i></span>
+            <input type="text" class="form-control bg-light  fw-bold" value="<?= htmlspecialchars($nombreAlmacen) ?>" readonly>
+        </div>
+        <input type="hidden" name="almacen_id" value="<?= $idSesion ?>">
+    <?php endif; ?>
+
+
+
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label text-danger">Producto Origen (Sale)</label>
+                                <select name="p_origen" class="form-select border-danger-subtle" required>
+                                    <option value="">Buscar producto...</option>
+                                    <?php foreach($todosLosProductos as $p): ?>
+                                        <option value="<?= $p['id'] ?>"
+                                         data-unidad="<?= htmlspecialchars($p['unidad_medida']) ?>"
+                data-sku="<?= htmlspecialchars($p['sku']) ?>"><?= htmlspecialchars($p['sku'] . " - " . $p['nombre']) ?>(<?= htmlspecialchars($p['unidad_medida']) ?>)</option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label text-success">Producto Destino (Entra)</label>
+                                <select name="p_destino" class="form-select border-success-subtle" required>
+                                    <option value="">Buscar producto...</option>
+                                    <?php foreach($todosLosProductos as $p): ?>
+                                        <option value="<?= $p['id'] ?>"
+                                         data-unidad="<?= htmlspecialchars($p['unidad_medida']) ?>"
+                data-sku="<?= htmlspecialchars($p['sku']) ?>"
+                ><?= htmlspecialchars($p['sku'] . " - " . $p['nombre']) ?>(<?= htmlspecialchars($p['unidad_medida']) ?>)</option>
+                                    
+                                        <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="p-3 bg-light rounded-3 border">
+                                    <label class="form-label d-block text-center mb-3">Factor de Rendimiento</label>
+                                    <div class="input-group input-group-lg">
+                                         <div class="badge bg-danger-subtle text-danger">
+            <i class="bi bi-box-arrow-up-right me-1"></i>
+            <span >Origen</span>
+                                        <input type="text" id="unidadOrigen" readonly>
+                                        </div>
+                                        <input type="number" step="0.0001" name="factor" class="form-control text-center fw-bold text-primary" placeholder="0.00" required>
+                                         <div class="badge bg-success-subtle text-success ">
+            <i class="bi bi-box-arrow-up-right me-1"></i>
+            <span >Destino</span>
+        
+                                        <input type="text" id="unidadDestino" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer  pt-0">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Configuración</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+        let org='';
+        let dest='';
+        document.querySelector('select[name="p_origen"]')
+    .addEventListener('change', function () {
+
+        const option = this.options[this.selectedIndex];
+
+        console.log(this.value);
+        org=option.dataset.unidad;
+        document.getElementById("unidadOrigen").value = org;
+        console.log(option.dataset.unidad);
+    });
+    document.querySelector('select[name="p_destino"]')
+    .addEventListener('change', function () {
+
+        const option = this.options[this.selectedIndex];
+
+        const productoId = this.value;
+        const unidad = option.dataset.unidad;
+        const sku = option.dataset.sku;
+        
+        dest=option.dataset.unidad;
+        document.getElementById("unidadDestino").value = dest;
+
+        console.log('Destino ID:', productoId);
+        console.log('Unidad:', unidad);
+        console.log('SKU:', sku);
+
+        // tu lógica aquí
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        const baseUrl = '/myvet/app/controllers/transmutacionesController.php';
+        
+        // Selectores principales
+        const transAlmacen = document.getElementById('trans_almacen');
+        const transProdOrigen = document.getElementById('trans_producto_origen');
+        const transLoteOrigen = document.getElementById('trans_lote_origen');
+        const transProdDestino = document.getElementById('trans_producto_destino');
+        const transLoteDestino = document.getElementById('trans_lote_destino');
+        const transCantOrigen = document.getElementById('trans_cant_origen');
+        const transCantDestino = document.getElementById('trans_cant_destino');
+        const infoConversion = document.getElementById('info_conversion');
+        const stockSpan = document.getElementById('trans_stock_disp');
+
+        // Inicializar DataTable con diseño Bootstrap 5
+   
+        // 1. Al cambiar Almacén -> Cargar Productos Origen
+        transAlmacen.addEventListener('change', async function() {
+            const id = this.value;
+            if(!id) return;
+            
+            try {
+                const response = await fetch(`${baseUrl.replace('transmutaciones','mermas')}?action=obtenerProductosAlmacen&almacen_id=${id}`);
+                const productos = await response.json();
+
+                
+                transProdOrigen.innerHTML = '<option value="">Seleccione Origen...</option>';
+
+productos.forEach(p => {
+
+    const option = new Option(
+        `${p.sku} - ${p.nombre} (${p.unidad_medida})`,
+        p.id
+    );
+
+    option.dataset.unidad = p.unidad_medida;
+
+    transProdOrigen.add(option);
+});
+                transProdOrigen.disabled = false;
+            } catch (e) { console.error("Error cargando productos", e); }
+        });
+        
+
+        // 2. Al cambiar Producto Origen -> Lotes y Destinos
+        transProdOrigen.addEventListener('change', async function() {
+            const pId = this.value;
+            const aId = transAlmacen.value;
+            if(!pId) return;
+
+            // Cargar Lotes
+            const resLotes = await fetch(`${baseUrl}?action=obtenerLotes&producto_id=${pId}&almacen_id=${aId}`);
+            const lotes = await resLotes.json();
+            transLoteOrigen.innerHTML = '<option value="">Seleccione Lote...</option>';
+            lotes.forEach(l => {
+                const opt = new Option(`${l.codigo_lote} (Disp: ${l.cantidad_actual})`, l.id);
+                opt.dataset.stock = l.cantidad_actual;
+                transLoteOrigen.add(opt);
+            });
+            transLoteOrigen.disabled = false;
+
+            // Cargar Destinos Compatibles
+            const resDest = await fetch(`${baseUrl}?action=obtenerDestinosCompatibles&producto_id=${pId}`);
+            const destinos = await resDest.json();
+            transProdDestino.innerHTML = '<option value="">Seleccione Destino...</option>';
+            destinos.forEach(d => {
+                const opt = new Option(`${d.sku} - ${d.nombre} (${d.unidad_medida})`, d.id);
+                opt.dataset.factor = d.rendimiento_teorico;
+                opt.dataset.unidad = d.unidad_medida;
+                transProdDestino.add(opt);
+            });
+            transProdDestino.disabled = false;
+        });
+
+        // 3. Al cambiar Lote Origen -> Actualizar Stock Disponible
+        transLoteOrigen.addEventListener('change', function() {
+            const stock = parseFloat(this.selectedOptions[0]?.dataset.stock || 0);
+            stockSpan.textContent = stock.toFixed(2);
+            transCantOrigen.max = stock;
+        });
+
+        // 4. Al cambiar Producto Destino -> Lotes Destino
+        transProdDestino.addEventListener('change', async function() {
+            const pId = this.value;
+            const aId = transAlmacen.value;
+            if(!pId) return;
+
+            const res = await fetch(`${baseUrl}?action=obtenerLotes&producto_id=${pId}&almacen_id=${aId}`);
+            const lotes = await res.json();
+            transLoteDestino.innerHTML = '<option value="0">-- Crear Lote Nuevo --</option>';
+            lotes.forEach(l => {
+                transLoteDestino.add(new Option(`Sumar a: ${l.codigo_lote} (Disp: ${l.cantidad_actual})`, l.id));
+            });
+            transLoteDestino.disabled = false;
+            calcularTeorico();
+        });
+
+        function calcularTeorico() {
+            const factor = parseFloat(transProdDestino.selectedOptions[0]?.dataset.factor || 0);
+            const cant = parseFloat(transCantOrigen.value || 0);
+            if(factor && cant) {
+                const sugerido = (factor * cant).toFixed(2);
+                infoConversion.innerHTML = `<i class="fas fa-magic me-1"></i> Rendimiento esperado: ${sugerido}`;
+                transCantDestino.placeholder = sugerido;
+            } else {
+                infoConversion.innerHTML = "";
+            }
+        }
+
+        transCantOrigen.addEventListener('input', calcularTeorico);
+
+        // 5. Submit Formulario Transmutación
+        document.getElementById('formTransmutacion').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            if(parseFloat(transCantOrigen.value) > parseFloat(stockSpan.textContent)) {
+                alert("⚠️ Cantidad insuficiente en el lote de origen.");
+                return;
+            }
+
+            try {
+                const res = await fetch(`${baseUrl}?action=guardar`, { method: 'POST', body: formData });
+                const result = await res.json();
+                
+                console.log("Debug Respuesta:", result); // Para tu consola de debug
+                
+                if(result.status === 'success') {
+                    alert("✅ Transmutación registrada correctamente.");
+                    location.reload();
+                } else {
+                    alert("❌ Error: " + result.message);
+                }
+            } catch (e) { alert("Error de conexión con el servidor."); }
+        });
+
+        // 6. Submit Nueva Equivalencia
+        document.getElementById('formNuevaEquivalencia').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            
+            try {
+                const formData = new FormData(this);
+                const res = await fetch(`${baseUrl}?action=guardarEquivalencia`, { method: 'POST', body: formData });
+                const result = await res.json();
+                
+                if(result.status === 'success') {
+                    alert(result.message);
+                    location.reload();
+                } else {
+                    alert("❌ " + result.message);
+                }
+            } catch (error) {
+                alert("❌ Error de red");
+            } finally { btn.disabled = false; }
+        });
+    });
+    </script>
+    <script>
+        $(document).ready(function() {
+    $('#tablaHistorial').DataTable({
+        "language": {
+            "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+        },
+        "order": [[ 0, "desc" ]], // Ordenar por la primera columna (ID) de forma descendente
+        "pageLength": 10,
+        "responsive": true,
+        "dom": '<"d-flex justify-content-between"f>rt<"d-flex justify-content-between"ip>',
+        "drawCallback": function() {
+            // Esto quita clases feas que a veces pone DataTables por defecto
+            $('.dataTables_paginate > .pagination').addClass('pagination-sm');
+        }
+    });
+});
+    </script>
+</body>
+</html>
