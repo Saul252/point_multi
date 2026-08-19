@@ -1,0 +1,195 @@
+:root { 
+    --nav-height: 65px; 
+    --sidebar-width: 0px;
+    
+    /* Paleta Claro (Default) */
+    --negro-delicado: #334155; 
+    --azul-clarito-bg: #eff6ff; 
+    --azul-enlace-active: #2563eb;
+    --borde-suave: #e2e8f0;
+    --navbar-dark: linear-gradient(135deg, #000000 0%, #02142c 100%) ;
+    
+    --sidebar-bg: #ffffff;
+    --sidebar-hover-bg: #f1f5f9;
+    --sidebar-hover-text: #0f172a;
+    --scrollbar-thumb: #cbd5e1;
+    --main-bg: linear-gradient(135deg, #f0fdf4,  #f1f5f9,#e0f2fe, #e2e8f0) !important;
+}
+
+/* Sobrescritura de variables para Modo Oscuro */
+[data-bs-theme="dark"] {
+    --negro-delicado: #cbd5e1; 
+    --azul-clarito-bg: rgba(37, 99, 235, 0.2); 
+    --azul-enlace-active: #60a5fa;
+    --borde-suave: #334155;
+  --navbar-dark: linear-gradient(135deg, #2c0626 0%, #43064e 100%) ;
+   
+    
+    --sidebar-bg: #1e293b;
+    --sidebar-hover-bg: #334155;
+    --sidebar-hover-text: #f8fafc;
+    --scrollbar-thumb: #475569;
+    --main-bg: #0f172a;
+}
+
+/* --- NAVBAR PREMIUM & EFECTOS --- */
+.navbar-premium { 
+    background: var(--navbar-dark) !important; 
+    height: var(--nav-height); 
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1050; /* Por encima de todo */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    padding: 0 1rem;
+    transition: background-color 0.3s ease;
+}
+
+/* Forzamos colores base */
+
+
+/* EFECTO HOVER EN NAVBAR */
+.navbar-premium .nav-link:hover,
+.navbar-premium .btn-link:hover,
+.navbar-premium .dropdown-toggle:hover {
+  
+    transform: translateY(-1px);
+    filter: drop-shadow(0 0 8px rgba(255,255,255,0.3));
+}
+
+/* Badge de usuario */
+.user-badge {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.user-badge:hover {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    transform: scale(1.02);
+}
+
+/* --- SIDEBAR CORREGIDO --- */
+#sidebar { 
+    width: 0; 
+    height: 100vh;
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    padding-top: var(--nav-height);
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--borde-suave); 
+    transition: all .3s cubic-bezier(0.4, 0, 0.2, 1); 
+    z-index: 1040; 
+    overflow-y: auto;
+    padding-bottom: 100px !important; 
+}
+
+/* Scrollbar Estético para el Sidebar */
+#sidebar::-webkit-scrollbar {
+    width: 5px;
+}
+#sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+#sidebar::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 10px;
+}
+
+/* LINKS DEL SIDEBAR */
+#sidebar .nav-link {
+ 
+    font-weight: 500;
+    font-size: 0.92rem;
+    padding: 10px 16px;
+    margin: 4px 12px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s ease;
+}
+
+#sidebar .nav-link i {
+    font-size: 1.15rem;
+   
+}
+
+#sidebar .nav-link:hover {
+    background-color: var(--sidebar-hover-bg);
+    color: var(--sidebar-hover-text) !important;
+}
+
+#sidebar .nav-link.active {
+    background-color: var(--azul-clarito-bg) !important;
+    color: var(--azul-enlace-active) !important;
+}
+
+#sidebar .nav-link.active i {
+    color: var(--azul-enlace-active) !important;
+}
+
+/* --- CONTENIDO PRINCIPAL --- */
+.main-content { 
+   
+    padding-top: 80px !important; 
+    padding-left: 20px;
+    padding-right: 20px;
+    transition: all .3s ease;
+    min-height: 100vh;
+    background-color: var(--main-bg);
+}
+
+/* --- RESPONSIVIDAD (MÓVIL) --- */
+@media (max-width: 992px) {
+    #sidebar {
+        left: calc(-1 * var(--sidebar-width));
+        top: 0;
+        padding-top: 20px;
+    }
+
+    #sidebar.show {
+        left: 0;
+        box-shadow: 10px 0 30px rgba(0,0,0,0.3);
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+    }
+
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(3px);
+        z-index: 1035;
+        display: none;
+    }
+    
+    .sidebar-overlay.active {
+        display: block;
+    }
+}
+/* Adaptación global de SweetAlert2 al modo claro/oscuro de Bootstrap */
+[data-bs-theme="dark"] .swal2-popup {
+    background-color: var(--bs-body-bg) !important;
+    color: var(--bs-body-color) !important;
+}
+
+[data-bs-theme="dark"] .swal2-title,
+[data-bs-theme="dark"] .swal2-content,
+[data-bs-theme="dark"] .swal2-html-container {
+    color: var(--bs-body-color) !important;
+}
+
+/* Ajusta los fondos grises dentro de las alertas al modo oscuro */
+[data-bs-theme="dark"] .swal2-popup .bg-light,
+[data-bs-theme="dark"] .swal2-popup .bg-body-tertiary text-body {
+    background-color: var(--bs-tertiary-bg) !important;
+    color: var(--bs-body-color) !important;
+}
+/* Ocultar sidebar en escritorio */
+#sidebar.hidden { transform: translateX(-100%); }
+body.sidebar-hidden .main-content { margin-left: 0 !important; }
